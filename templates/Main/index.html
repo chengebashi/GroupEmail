@@ -1,0 +1,316 @@
+{% extends 'Main/base.html' %}
+
+{% block title %}
+    发送邮件
+{% endblock %}
+
+
+{% block body %}
+
+    <!-- Main container starts -->
+    <div class="container main-container" id="main-container">
+        <div class="row" style="justify-content: center;">
+            <div class="col-12 col-md-7 col-lg-8" style="text-align: left">
+                <p class="text-template-primary-light" style="text-align: center;font-size: 28px;">发送邮件</p>
+                <div class="page-subtitle">发送给:</div>
+
+
+                <div style="display: flex" id="receive">
+                    <div class="form-group" style="display: inline-block;flex: 9">
+                        <input type="text" class="form-control receiver" placeholder="填写收件人邮箱">
+                    </div>
+                    <button style="display: flex;margin-right:0!important;margin-bottom: 0!important;margin-left: 15px;justify-content:center;height: 38px;width: 38px" type="button" class="addbtn mb-2 mr-2 btn-rounded-circle shadow btn btn-primary"><i class="material-icons">add</i></button>
+                </div>
+
+                <div class="page-subtitle">标题:</div>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="Emailtitle" placeholder="填写邮件标题">
+                </div>
+
+                <div class="page-subtitle">邮件内容:</div>
+                <textarea class="form-control" rows="15" id="content"></textarea>
+
+                <hr style="margin-top: 45px;background: rgba(128, 128, 128, 0.5)">
+
+                <div class="card-body" style="display:flex;justify-content: space-between;padding-right: 0;padding-left: 50px;padding-top: 10px">
+                    <button id="sendEmail" style="margin: 0 auto" type="button" class="mb-2 btn btn-success">发&nbsp&nbsp&nbsp送</button>
+                    <button id="saveEmail" type="button" class="mb-2 btn btn-warning">保&nbsp&nbsp&nbsp存</button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <!-- Main container ends -->
+
+    <div class="alert alert-danger" id="alert" style="box-shadow: 0.1rem 0.01rem 0.25rem 0.25rem rgba(0,0,0,0.175) !important;width: 300px;text-align: center;position: fixed;z-index: 99;top: 100px;left: 40%;display: none;">
+                    This is a danger alert—check it out!
+            </div>
+
+
+        <!--弹窗-->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="margin-top: 150px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i style="line-height: 1.3;color: #ffa914" class="material-icons">notifications</i>&nbsp<h5 class="modal-title" id="exampleModalLabel">警&nbsp&nbsp告</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div id="warningcontent" class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!--加载弹窗-->
+    <div class="modal fade" id="Loading" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="margin-top: 150px">
+            <div class="modal-content" style="background-color: rgba(255, 255, 255, 0); border:none">
+                <!--<div class="modal-header">-->
+                    <!--<i style="line-height: 1.3;color: #ffa914" class="material-icons">notifications</i>&nbsp<h5 class="modal-title" id="exampleModalLabel">警&nbsp&nbsp告</h5>-->
+                    <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
+                        <!--<span aria-hidden="true">×</span>-->
+                    <!--</button>-->
+                <!--</div>-->
+                <div id="warningcontent123" style="padding: 0;height: 300px;border: none;background-color: rgba(255, 0, 0, 0);" class="modal-body">
+                    <iframe src="/loading" style="width: 100%;height: 100%;border:none"></iframe>
+                </div>
+                <!--<div class="modal-footer">-->
+                    <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
+                <!--</div>-->
+            </div>
+        </div>
+    </div>
+
+    <!--<form action="/hello" method="post">-->
+        <!--<button data-toggle="modal" data-target="#Loading">出现</button>-->
+    <!--</form>-->
+    <input style="display: none" type="text" id="flagtoast" />
+
+
+
+{% endblock %}
+
+{% block script %}
+    <script>
+        var SAVE = {{emailsave|safe}};
+        console.log(SAVE);
+        $("#flagtoast").val(SAVE[0]);
+        $("#Emailtitle").val(SAVE[3]);
+        $("#content").val(SAVE[4]);
+        var receversList = SAVE[2];
+        console.log(receversList);
+        if (receversList.length == 1){
+            $(".receiver").val(receversList[0])
+        }
+        else{
+
+            for (var r=0;r<receversList.length-1;r++){
+                $(function () {
+                $("#receive").after($("<div style=\"display: flex\" class=\"receive\">\n" +
+                    "                    <div class=\"form-group\" style=\"display: inline-block;flex: 9\">\n" +
+                    "                        <input type=\"text\" class=\"form-control receiver\" placeholder=\"填写收件人邮箱\">\n" +
+                    "                    </div>\n" +
+                    "                    <button style=\"display: flex;margin-right:0!important;margin-bottom: 0!important;margin-left: 15px;justify-content:center;height: 38px;background-color: #F85778 !important;border:none;width: 38px\" type=\"button\" class=\"delete mb-2 mr-2 btn-rounded-circle shadow btn btn-primary\"><i class=\"material-icons\">delete</i></button>\n" +
+                    "                </div>"));
+                bb();})
+
+            }
+            var bb =function () {
+                var receiver=document.querySelectorAll('.receiver');
+                    for (var i=0;i<receversList.length;i++){
+                        receiver[i].value = receversList[i];
+                    }
+
+                $(".receive button").click(function () {
+                    $(this).parent().remove();
+                })
+                };
+
+        }
+
+
+
+
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            if ($("#flagtoast").val().length==0){
+                 if (window.name == "") {
+                    $.toast({
+                        heading: '登陆成功!',
+                        text: '<div class="row"><div class="col-auto"><i class="material-icons mr-2">beenhere</i></div><div class="col pl-0"><i class="material-icons text-danger fs13">favorite</i> 新的一天新的希望！</div></div>',
+                        loader: true,
+                        loaderBg: '#ffffff',
+                        bgColor: '#1FC96E',
+                        position: 'bottom-center',
+                    });
+                    window.name = "0";
+
+                }
+                else {
+                    window.name = eval(window.name) + 1;
+                    // alert("已经刷新"+ window.name+'次');
+                    console.log(1)
+                }
+            }
+
+
+            $(".addbtn").click(function () {
+                $("#receive").after($("<div style=\"display: flex\" class=\"receive\">\n" +
+                    "                    <div class=\"form-group\" style=\"display: inline-block;flex: 9\">\n" +
+                    "                        <input type=\"text\" class=\"form-control receiver\" placeholder=\"填写收件人邮箱\">\n" +
+                    "                    </div>\n" +
+                    "                    <button style=\"display: flex;margin-right:0!important;margin-bottom: 0!important;margin-left: 15px;justify-content:center;height: 38px;background-color: #F85778 !important;border:none;width: 38px\" type=\"button\" class=\"delete mb-2 mr-2 btn-rounded-circle shadow btn btn-primary\"><i class=\"material-icons\">delete</i></button>\n" +
+                    "                </div>"));
+                bb();
+            });
+            var bb =function () {
+                $(".receive button").click(function () {
+                    $(this).parent().remove();
+            })
+            };
+
+
+            $("#sendEmail").click(function () {
+                var receiver = [];
+                var errorTip = [];
+                $('.receiver').each(function(key,value){
+                    var re= /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+                    var temp = $(this).val();
+                    if (re.test(temp)){
+                        receiver[key] = temp;
+                    }
+                    else{
+                        key = key+1;
+                        errorTip.push('第'+key+'个联系人邮箱格式有误!'+'\n');
+                    }
+                });
+                var title = $("#Emailtitle").val();
+                var content = $("#content").val();
+                if(errorTip.length>0){
+                    var html_err = '';
+                    for(var err=0;err<errorTip.length;err++){
+                        html_err = html_err+'<p>'+errorTip[err]+'</p>'
+                    }
+                    $("#warningcontent").html(html_err);
+                    $('#exampleModal').modal('show');
+                }
+                else if (title.length==0){
+                    $("#warningcontent").html('标题不可为空！');
+                    $('#exampleModal').modal('show');
+                }
+                else if (content.length==0){
+                    $("#warningcontent").html('邮件内容不可为空！');
+                    $('#exampleModal').modal('show');
+                }
+                else {
+                    $("#Loading").modal('show');
+                    var data_data = JSON.stringify({'receivers':receiver,'title':title,'content':content});
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json; charset = UTF-8',
+                        dataType: 'json',
+                        url:'/sendEmail',
+                        data:data_data,
+                        success:function (data) {
+                            $("#Loading").modal('hide');
+                            if(data.err == 0){
+                                $(".form-group input").val('');
+                                $("#content").val('');
+                                $("#alert").html('发送成功！');
+                                $("#alert").fadeIn(1000);
+                                $("#alert").fadeOut(6000);
+                            }
+                            else{
+                                $("#alert").html(data.err);
+                                $("#alert").fadeIn(1000);
+                                $("#alert").fadeOut(6000);
+                            }
+                        },
+                        error:function () {
+
+                        }
+                    })
+                }
+                console.log(receiver);
+                console.log(title);
+                console.log(content);
+            });
+
+
+            $("#saveEmail").click(function () {
+                var receiver = [];
+                var errorTip = [];
+                $('.receiver').each(function(key,value){
+                    var re= /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+                    var temp = $(this).val();
+                    if (re.test(temp)){
+                        receiver[key] = temp;
+                    }
+                    else{
+                        key = key+1;
+                        errorTip.push('第'+key+'个联系人邮箱格式有误!'+'\n');
+                    }
+                });
+                var title = $("#Emailtitle").val();
+                var content = $("#content").val();
+                if(errorTip.length>0){
+                    var html_err = '';
+                    for(var err=0;err<errorTip.length;err++){
+                        html_err = html_err+'<p>'+errorTip[err]+'</p>'
+                    }
+                    $("#warningcontent").html(html_err);
+                    $('#exampleModal').modal('show');
+                }
+                else if (title.length==0){
+                    $("#warningcontent").html('标题不可为空！');
+                    $('#exampleModal').modal('show');
+                }
+                // else if (content.length==0){
+                //     $("#warningcontent").html('邮件内容不可为空！');
+                //     $('#exampleModal').modal('show');
+                // }
+                else {
+                    var data_data = JSON.stringify({'receivers':receiver,'title':title,'content':content,'flag':$("#flagtoast").val()});
+                    $.ajax({
+                        type: 'POST',
+                        contentType: 'application/json; charset = UTF-8',
+                        dataType: 'json',
+                        url:'/saveEmail',
+                        data:data_data,
+                        success:function (data) {
+                            if(data.err == 0){
+                                $(".form-group input").val('');
+                                $("#content").val('');
+                                $("#alert").html('保存邮件成功，请在草稿箱中查看！');
+                                $("#alert").fadeIn(1000);
+                                $("#alert").fadeOut(6000);
+                            }
+                            else{
+                                $("#alert").html(data.err);
+                                $("#alert").fadeIn(1000);
+                                $("#alert").fadeOut(6000);
+                            }
+                        },
+                        error:function () {
+
+                        }
+                    })
+                }
+                console.log(receiver);
+                console.log(title);
+                console.log(content);
+            })
+
+        });
+    </script>
+
+{% endblock %}
